@@ -1,0 +1,33 @@
+import socket
+import threading
+import random
+
+# Quotes to be served by the server
+quotes = [
+    "The best way to predict the future is to create it. - Abraham Lincoln",
+    "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+    "The only way to do great work is to love what you do. - Steve Jobs"
+]
+
+def handle_client(client_socket):
+    """Handles client requests by sending a random quote"""
+    quote = random.choice(quotes)
+    client_socket.send(quote.encode())
+    client_socket.close()
+
+def main():
+    """Main function to start the server"""
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(("0.0.0.0", 8888))
+    server_socket.listen(5)
+    print("[*] Listening on 0.0.0.0:8888")
+
+    while True:
+        client_socket, addr = server_socket.accept()
+        print("[*] Accepted connection from: %s:%d" % (addr[0],addr[1]))
+        client_handler = threading.Thread(target=handle_client, args=(client_socket,))
+        client_handler.start()
+
+if __name__ == "__main__":
+    main()
+
